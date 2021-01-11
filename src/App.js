@@ -1,24 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import Layout from './core/Layout';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout>
+      <h1 className="pt-5 text-center">Welcome</h1>
+      <div className="text-center">
+        <img
+          src={`${process.env.PUBLIC_URL}/toppage.jpg`}
+          style={{ height: "80vh" }}
+        />
+      </div>
+
+    </Layout>
   );
 }
 

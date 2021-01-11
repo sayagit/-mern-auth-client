@@ -1,17 +1,11 @@
+//このファイルがJavaScriptのエントリーポイントとなる
+//(public/index.htmlがpage template)
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import Routes from './Routes';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+//react-scriptによりport3000にてindex.htmlを表示する
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+//render内のコードがpublic/index.jsのroot divの中身になる
+//つまり、src/Routes.js に書いた記述がブラウザ上のページ(index.html)に反映される
+ReactDOM.render(<Routes />, document.getElementById('root'));

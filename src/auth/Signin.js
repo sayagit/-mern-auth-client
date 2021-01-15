@@ -48,7 +48,7 @@ const Signin = ({ history }) => {
                 });
             })
             .catch(error => {
-                console.log('SIGNIN ERROR', error.response.data);
+                console.log('SIGNIN ERROR');
                 setValues({ ...values, buttonText: 'Submit' });
                 toast.error(error.response.data.error);
             });

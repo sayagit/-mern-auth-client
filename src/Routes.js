@@ -10,6 +10,7 @@ import PrivateRoute from './auth/PrivateRoute';
 import Admin from './core/Admin';
 import AdminRoute from './auth/AdminRoute';
 
+
 //Routerは、どのURLが、どのリクエストに紐づいているのかを設定する
 //ReactではBrowserRouterというコンポーネントを使う
 //<Switch>内にルーティングを記述することで、urlにマッチされた最初のルーティングだけがレンダリングされる

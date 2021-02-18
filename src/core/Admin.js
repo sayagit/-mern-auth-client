@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React from 'react';
 import Layout from '../core/Layout';
 
 const Admin = () => (

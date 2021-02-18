@@ -6,10 +6,10 @@ import Signin from './auth/Signin';
 import Activate from './auth/Activate';
 import Update from './core/Update';
 import Private from './core/Private';
+import Calendar from './Calendar';
 import PrivateRoute from './auth/PrivateRoute';
 import Admin from './core/Admin';
 import AdminRoute from './auth/AdminRoute';
-
 
 //Routerは、どのURLが、どのリクエストに紐づいているのかを設定する
 //ReactではBrowserRouterというコンポーネントを使う
@@ -24,7 +24,7 @@ const Routes = () => {
                 <Route path="/signin" exact component={Signin} />
                 <Route path="/auth/activate/:token" exact component={Activate} />
                 <PrivateRoute path="/update" exact component={Update} />
-                <PrivateRoute path="/private" exact component={Private} />
+                <PrivateRoute path="/private" exact component={Calendar} />
                 <AdminRoute path="/admin" exact component={Admin} />
             </Switch>
         </BrowserRouter>

@@ -31,18 +31,19 @@ const Calendar = ({ match }) => {
     // const classes = useStyles()
     const [show, setShow] = useState(false)
 
-    const [myEvents, setMyEvents] = useState([]);
     const [inputs, setInputs] = useState(
         // new myEventsType(0, "", "", "", false)
         {
             id: 0,
             title: "",
-            start: new Date(),
-            end: new Date(),
+            start: "",
+            end: "",
             allday: false
         }
     );
     const { id, title, start, end, allday } = inputs;
+
+    const [isUpdate, setIsUpdate] = useState(false);
 
     const ref = useRef(null);
 
@@ -57,18 +58,23 @@ const Calendar = ({ match }) => {
             })
             .then(response => {
                 console.log('SCHEDULE ITEM SAVED SUCCESSFULLY', response);
-                setInputs({ ...inputs, title: '', start: '', end: '', allDay: false });
+                ref.current.getApi().addEvent({
+                    id: id,
+                    title: title,
+                    start: start,
+                    end: end,
+                    allday: allday
+                });
                 //react-toastifyのメソッド アラートを表示する
                 toast.success(response.data.message);
             })
             .catch(error => {
                 console.log('SCHEDULE EVENT SAVING ERROR', error.response.data.error);
                 // console.log('SCHEDULE EVENT SAVING ERROR');
-                setInputs({ ...inputs, title: '', start: '', end: '', allDay: false });
                 toast.error(error.response.data.error);
             });
         if (setShow) {
-            setShow(false);
+            modalShowing(false)
         }
     }
 
@@ -90,7 +96,7 @@ const Calendar = ({ match }) => {
                 //     end: result[i].end
                 // })
                 ref.current.getApi().addEvent({
-                    id: i,
+                    id: result[i].id,
                     title: result[i].title,
                     start: result[i].start,
                     end: result[i].end
@@ -145,29 +151,18 @@ const Calendar = ({ match }) => {
         })
     }
 
-    // const clickSubmit = event => {
-    //     event.preventDefault();
-    //     // setValues({ ...values, buttonText: 'Submitting' });
+    const handleClick = (info) => {
+        setIsUpdate(true);
+        setShow(true);
 
-    //     const reactAppApi = process.env.REACT_APP_API;
-    //     //axios:ブラウザやnode.js上で動くPromiseベースのHTTPクライアント
-    //     //      HTTP通信を簡単に行うことができる
-    //     axios.post(`${reactAppApi}/schedule/save`,
-    //         { title, start, end, allday }
-    //     )
-    //         .then(response => {
-    //             console.log('SCHEDULE EVENT SAVED SUCCESSFULLY', response);
-    //             setInputs({ ...values, title: '', start: '', end: '', allDay: false });
-    //             //react-toastifyのメソッド アラートを表示する
-    //             toast.success(response.data.message);
-    //         })
-    //         .catch(error => {
-    //             console.log('SCHEDULE EVENT SAVING ERROR', error.response.data);
-    //             setValues({ ...values, buttonText: 'Submit' });
-    //             toast.error(error.response.data.error);
-    //         });
-    // };
-
+        setInputs({
+            id: info.event.id,
+            title: info.event.title,
+            start: info.event.start,
+            end: info.event.end,
+            allday: info.event.allday
+        })
+    };
 
     const titleElement = (
         <div>
@@ -230,13 +225,33 @@ const Calendar = ({ match }) => {
                 type="button"
                 value="Cancel"
                 onClick={() => {
-                    setShow(false)
+                    modalShowing(false);
+
                 }}
             />
+            {!isUpdate && (
+                <input
+                    type="button"
+                    value="Save"
+                    onClick={() => saveItem()}
+                />
+            )}
+            {isUpdate && (
+                <input
+                    type="button"
+                    value="Update"
+                    onClick={() => alert("updateItem")}
+                />
+            )}
+        </div>
+    )
+
+    const deleteElement = (
+        <div>
             <input
                 type="button"
-                value="Save"
-                onClick={() => saveItem()}
+                value="Delete Event"
+                onClick={() => alert("DeleteItem")}
             />
         </div>
     )
@@ -250,9 +265,15 @@ const Calendar = ({ match }) => {
             {startTimeElement}
             {endTimeElement}
             {btnElement}
+            {isUpdate && deleteElement}
         </form>
     );
 
+    const modalShowing = (v) => {
+        setShow(v);
+        setIsUpdate(v);
+        setInputs({ id: 0, title: '', start: '', end: '', allDay: false });
+    }
 
     const CalendarComponent = () => (
         <div>
@@ -269,7 +290,8 @@ const Calendar = ({ match }) => {
                     end: 'dayGridMonth,timeGridWeek'
                 }}
                 ref={ref}
-                select={handleSelect}
+                select={handleSelect} // カレンダー範囲選択時
+                eventClick={handleClick} // イベントクリック時
             />
         </div>
     );
@@ -280,7 +302,7 @@ const Calendar = ({ match }) => {
             <div>
                 <ToastContainer />
                 {/* <p>{JSON.stringify(list)}</p> */}
-                <Modal show={show} setShow={setShow} content={content} />
+                <Modal show={show} setShow={modalShowing} content={content} />
                 {CalendarComponent()}
             </div>
 

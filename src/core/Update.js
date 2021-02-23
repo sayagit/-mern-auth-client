@@ -64,6 +64,7 @@ const Private = ({ history }) => {
         })
             .then(response => {
                 console.log('PRIVATE PROFILE UPDATE SUCCESS', response);
+                //localStorageの情報をアップデート
                 updateUser(response, () => {
                     setValues({ ...values, buttonText: 'Submitted' });
                     toast.success('Profile updated successfully');

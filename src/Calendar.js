@@ -96,11 +96,13 @@ const Calendar = ({ match }) => {
                 //     end: result[i].end
                 // })
                 ref.current.getApi().addEvent({
-                    id: result[i].id,
+                    id: result[i]._id,
                     title: result[i].title,
                     start: result[i].start,
-                    end: result[i].end
+                    end: result[i].end,
+                    allday: result[i].allday
                 });
+                console.log(result[i]._id, result[i].title, result[i].start, result[i].end, result[i].allday)
             }
             // testItems.push({
             //     id: 0,
@@ -123,6 +125,41 @@ const Calendar = ({ match }) => {
         // return promise;
     }
 
+    function updateItem() {
+        console.log("updating schedule item below", { id, title, start, end, allday })
+        const promise = axios({
+            method: 'PUT',
+            url: `${process.env.REACT_APP_API}/scheduleItem/update`,
+            data: { id, title, start, end, allday }
+        }).then((response) => {
+            console.log('SCHEDULE ITEM UPDATE SUCCESS', response);
+
+            const result = response.data.item;
+            // ref.current.getApi().addEvent({
+            //     id: result._id,
+            //     title: result.title,
+            //     start: result.start,
+            //     end: result.end,
+            //     allday: result.allday
+            // });
+            const event = ref.current.getApi().getEventById(result._id);
+            event.setExtendedProp({
+                title: result.title,
+                start: result.start,
+                end: result.end,
+                allday: result.allday
+            })
+
+
+            toast.success(response.data.message);
+        }).catch(error => {
+            console.log('SCHEDULE ITEM UPDATING ERROR', error);
+        });
+        if (setShow) {
+            modalShowing(false)
+        }
+    }
+
     //動作確認用　テストイベント
     const defaultEvents = [{
         id: 0,
@@ -142,26 +179,38 @@ const Calendar = ({ match }) => {
 
     //カレンダーがクリックされた時にイベント登録用のフォームを表示する。
     const handleSelect = (selectInfo) => {
-        setShow(true);
+        if (ref.current.getApi().view.type === "dayGridMonth") {
+            ref.current.getApi().changeView("timeGridDay", selectInfo.start);
+        } else {
+            setShow(true);
 
-        setInputs({
-            ...inputs,
-            start: selectInfo.start,
-            end: selectInfo.end
-        })
+            setInputs({
+                ...inputs,
+                start: selectInfo.start,
+                end: selectInfo.end
+            })
+        }
+
     }
 
+    //既存のイベントがクリックされたら、アップデートと削除のフォームを表示する
     const handleClick = (info) => {
-        setIsUpdate(true);
-        setShow(true);
+        if (ref.current.getApi().view.type === "dayGridMonth") {
+            // ref.current.getApi().changeView("timeGridDay", info.event.start);
+            // console.log(info)
+        } else {
+            setIsUpdate(true);
+            setShow(true);
 
-        setInputs({
-            id: info.event.id,
-            title: info.event.title,
-            start: info.event.start,
-            end: info.event.end,
-            allday: info.event.allday
-        })
+            setInputs({
+                id: info.event.id,
+                title: info.event.title,
+                start: info.event.start,
+                end: info.event.end,
+                allday: info.event.allday
+            })
+            console.log("setInputs: ", info.event.id)
+        }
     };
 
     const titleElement = (
@@ -208,7 +257,7 @@ const Calendar = ({ match }) => {
                 selected={end}
                 showTimeSelect
                 timeFormat="HH:mm"
-                timeIntervals={10}
+                timeIntervals={30}
                 todayButton="today"
                 name="inputEnd"
                 onChange={(time) => {
@@ -240,7 +289,7 @@ const Calendar = ({ match }) => {
                 <input
                     type="button"
                     value="Update"
-                    onClick={() => alert("updateItem")}
+                    onClick={() => updateItem()}
                 />
             )}
         </div>
@@ -260,7 +309,6 @@ const Calendar = ({ match }) => {
     const content = (
         <form action="">
             <p>Create a new event</p>
-            {/* <p>{readItems2()}</p> */}
             {titleElement}
             {startTimeElement}
             {endTimeElement}
@@ -280,14 +328,14 @@ const Calendar = ({ match }) => {
             <p>{console.log("fullcalender called")}</p>
             <FullCalendar
                 plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]} // 週表示、月表示、日付等のクリックを可能にするプラグインを設定。
-                initialView="timeGridWeek" // カレンダーの初期表示設定。この場合、週表示。
+                initialView="dayGridMonth" // カレンダーの初期表示設定。この場合、週表示。
                 slotDuration="00:30:00"　// 週表示した時の時間軸の単位。
                 selectable={true} // 日付選択を可能にする。interactionPluginが有効になっている場合のみ。
                 // initialEvents={list}
                 headerToolbar={{ // カレンダーのヘッダー設定。
                     start: 'title',
                     center: 'prev, next, today',
-                    end: 'dayGridMonth,timeGridWeek'
+                    end: 'dayGridMonth,timeGridDay'
                 }}
                 ref={ref}
                 select={handleSelect} // カレンダー範囲選択時

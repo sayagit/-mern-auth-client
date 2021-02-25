@@ -12,6 +12,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import Tooltip from "@material-ui/core/Tooltip";
 import Layout from './core/Layout';
 import Modal from './core/Modal';
 
@@ -323,8 +324,19 @@ const Calendar = ({ match }) => {
         setInputs({ id: 0, title: '', start: '', end: '', allDay: false });
     }
 
+    const tooltipEvent = (info) => {
+        console.log("eventRender")
+        const tooltip = new Tooltip(info.el, {
+            title: "test",
+            placement: 'top',
+            trigger: 'hover',
+            container: 'body'
+        });
+    }
+
     const CalendarComponent = () => (
         <div>
+
             <p>{console.log("fullcalender called")}</p>
             <FullCalendar
                 plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]} // 週表示、月表示、日付等のクリックを可能にするプラグインを設定。
@@ -340,6 +352,7 @@ const Calendar = ({ match }) => {
                 ref={ref}
                 select={handleSelect} // カレンダー範囲選択時
                 eventClick={handleClick} // イベントクリック時
+                eventRender={tooltipEvent}
             />
         </div>
     );
